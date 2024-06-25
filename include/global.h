@@ -38,6 +38,21 @@ extern int currentSwitchPosition;
 extern bool ledState;
 
 /**
+ * @brief Gibt den gegebenen Fehler aus und blinkt die rote LED.
+ *
+ * @param errorMessage Die Fehlermeldung.
+ */
+void handleError(const String &errorMessage);
+
+/**
+ * @brief Überprüft, ob der gegebene Pin eine gültige LED-Pinnummer ist.
+ *
+ * @param pin Die Pinnummer.
+ * @return true, wenn der Pin eine gültige LED-Pinnummer ist, ansonsten false.
+ */
+bool isValidPin(int pin);
+
+/**
  * @brief Blinkt die LED am gegebenen Pin für die angegebene Dauer.
  *
  * @param pin Der Pin der LED.

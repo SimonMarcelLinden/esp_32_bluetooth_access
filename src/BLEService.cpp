@@ -22,6 +22,10 @@ void BTServerCallbacks::onDisconnect(BLEServer* pServer) {
 
 void BTCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
 	std::string value = pCharacteristic->getValue();
+    if (value.empty()) {
+        handleError("Received empty BLE characteristic value");
+        return;
+    }
     mySerial.println(value.c_str());
 }
 

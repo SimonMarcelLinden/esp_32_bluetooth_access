@@ -16,12 +16,34 @@ const int ledPins[NUM_LED_PINS] = {redLedPin, yellowLedPin, greenLedPin};
 int currentSwitchPosition = -1;
 bool ledState = false;
 
+void handleError(const String &errorMessage) {
+    DEBUG_PRINT("Error: " + errorMessage);
+    blinkLed(redLedPin, 1000);
+}
+
+bool isValidPin(int pin) {
+    for (int i = 0; i < NUM_LED_PINS; i++) {
+        if (ledPins[i] == pin) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void setLedState(int pin, bool state) {
+	if (!isValidPin(pin)) {
+        handleError("Invalid LED pin: " + String(pin));
+        return;
+    }
 	digitalWrite(pin, state ? HIGH : LOW);
 }
 
 void blinkLed(int pin, int duration) {
-    setLedState(pin, HIGH);
+    if (!isValidPin(pin)) {
+        handleError("Invalid LED pin: " + String(pin));
+        return;
+    }
+	setLedState(pin, HIGH);
     delay(duration / 2);
     setLedState(pin, LOW);
     delay(duration / 2);

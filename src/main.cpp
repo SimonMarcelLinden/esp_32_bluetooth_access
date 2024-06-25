@@ -18,7 +18,16 @@ void clearSerialBuffer() {
 void setup() {
 	// Initialisierung der eigenen seriellen Schnittstellen
 	Serial.begin(9600);
+	if (!Serial) {
+        handleError("Serial initialization failed");
+        return;
+    }
+
 	mySerial.begin(1200, SERIAL_8N1, 17, 16); // RX1, TX1
+	if (!mySerial) {
+        handleError("mySerial initialization failed");
+        return;
+    }
 
     BLEDevice::init("Schulz-BT-ESP32");
 
@@ -34,9 +43,8 @@ void setup() {
 	}
 
 	std::string deviceName = "Schulz BT - " + BLEDevice::getAddress().toString();
-    if (DEBUG) Serial.print("Device Name: ");
-   	if (DEBUG) Serial.println(deviceName.c_str());
     setupBLE(deviceName);
+	DEBUG_PRINT("Device Name: " + deviceName);
 
 	setLedState(redLedPin, LOW);
 	setLedState(yellowLedPin, LOW);
@@ -48,14 +56,18 @@ void loop() {
 	int switchPosition = readSwitchPosition();
 
 	if (switchPosition != currentSwitchPosition && switchPosition != -1) {
-		currentSwitchPosition = switchPosition;
-
-		mySerial.updateBaudRate(baudRates[switchPosition]);
-	}
+        currentSwitchPosition = switchPosition;
+        mySerial.updateBaudRate(baudRates[switchPosition]);
+        DEBUG_PRINT("Baudrate updated to: " + String(baudRates[switchPosition]));
+    }
 
 	if (mySerial.available() > 0) {
 		// Nachricht lesen
 		String message = mySerial.readStringUntil('\n');
+		if (message.length() == 0) {
+            handleError("Empty message received from mySerial");
+            return;
+        }
 		Serial.println(message);
    		digitalWrite(redLedPin, LOW);
 		blinkLed(yellowLedPin, 1000);
@@ -75,7 +87,9 @@ void loop() {
 	if (Serial.available()) {
 		String input = Serial.readStringUntil('\n');
 		input.trim();
-		mySerial.println(input);
+		if (input.length() > 0) {
+            mySerial.println(input);
+        }
 	}
 
 	// Puffer leeren
