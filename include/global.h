@@ -1,36 +1,61 @@
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#pragma once
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
 
-#define DEBUG true
+#define DEBUG 0
 
-HardwareSerial mySerial(1);
+#if DEBUG
+	#define DEBUG_PRINT(x) Serial.println(x)
+#else
+	#define DEBUG_PRINT(x)
+#endif
 
-extern const int greenLedPin, yellowLedPin, redLedPin;
+// Deklaration der seriellen Schnittstelle
+extern HardwareSerial mySerial;
+
+// LED-Pins
+extern const int greenLedPin;
+extern const int yellowLedPin;
+extern const int redLedPin;
 
 // Pinbelegung für den Drehschalter (8 Positionen)
-const int switchPins[] = {2, 4, 5, 18, 26, 25, 33, 32};
+const int NUM_SWITCH_PINS = 8;
+extern const int switchPins[NUM_SWITCH_PINS];
 
 // Mögliche Baudraten, die eingestellt werden können
-const int baudRates[] = {115200, 57600, 38400, 19200, 1200, 2400, 4800, 9600};
+const int NUM_BAUD_RATES = 8;
+extern const int baudRates[NUM_BAUD_RATES];
 
 // Pinbelegung für die LEDs
-const int ledPins[] = {redLedPin, yellowLedPin, greenLedPin};;
+const int NUM_LED_PINS = 3;
+extern const int ledPins[NUM_LED_PINS];
 
-int currentSwitchPosition = -1;
+// Aktuelle Position des Drehschalters
+extern int currentSwitchPosition;
 
-void blinkLed(int pin, int duration);
+// Zustand der LED
+extern bool ledState;
 
+/**
+ * @brief Blinkt die LED am gegebenen Pin für die angegebene Dauer.
+ *
+ * @param pin Der Pin der LED.
+ * @param duration Die Dauer des Blinkens in Millisekunden.
+ */
+extern void blinkLed(int pin, int duration);
 
-int readSwitchPosition() {
-    for (int i = 0; i < 8; i++) {
-        if (digitalRead(switchPins[i]) == LOW) {
-            return i;
-        }
-    }
-    return -1; // Keine gültige Position gefunden
-}
+/**
+ * @brief Setzt den Zustand der LED am gegebenen Pin.
+ *
+ * @param pin Der Pin der LED.
+ * @param state Der Zustand der LED (true für an, false für aus).
+ */
+extern void setLedState(int pin, bool state);
 
-#endif // GLOBAL_H
+/**
+ * @brief Liest die aktuelle Position des Drehschalters.
+ *
+ * @return Die Position des Drehschalters (0-7) oder -1, wenn keine gültige Position gefunden wurde.
+ */
+extern int readSwitchPosition();
