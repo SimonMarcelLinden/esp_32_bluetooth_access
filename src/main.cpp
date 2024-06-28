@@ -52,7 +52,7 @@ void setup() {
 
 	std::string deviceName = "Schulz BT - " + BLEDevice::getAddress().toString();
 	setupBLE(deviceName);
-	DEBUG_PRINT("Device Name: " + deviceName);
+	DEBUG_PRINT(String("Device Name: ") + deviceName.c_str());
 }
 
 void loop() {
