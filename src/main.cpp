@@ -25,9 +25,11 @@ void setup() {
 	if (!Serial) {
 		handleError("Serial initialization failed");
 		return;
+	} else {
+    	DEBUG_PRINT("Serial initialized");
 	}
 
-	mySerial.begin(1200, SERIAL_8N1, rxPin, txPin); // RX1, TX1
+	mySerial.begin(1200, SERIAL_8N1, txPin, rxPin); // RX1, TX1
 	// Setze die Pins auf INPUT_PULLUP und überprüfe den Zustand
 	// pinMode(rxPin, INPUT);
 	// pinMode(txPin, INPUT);
@@ -35,6 +37,8 @@ void setup() {
 	if (!mySerial) {
 		handleError("mySerial initialization failed");
 		return;
+	} else {
+    	DEBUG_PRINT("mySerial initialized with 1200 baud");
 	}
 
 	BLEDevice::init("Schulz-BT-ESP32");
@@ -72,12 +76,13 @@ void loop() {
 			handleError("Empty message received from mySerial");
 			return;
 		}
+        message.replace("\n", "\r\n");
 		Serial.println(message);
+		Serial.flush(); // Stelle sicher, dass die Nachricht vollständig gesendet wurde
 
 		// Nachricht über Bluetooth senden
 		if (btDeviceConnected) {
-			pCharacteristic->setValue(message.c_str());
-			pCharacteristic->notify();
+			sendBLEMessage(message);
 		}
 	}
 
@@ -85,7 +90,9 @@ void loop() {
 		String input = Serial.readStringUntil('\n');
 		input.trim();
 		if (input.length() > 0) {
+            mySerial.print(input + "\r\n"); // Füge '\r\n' hinzu
 			mySerial.println(input);
+			mySerial.flush(); // Stelle sicher, dass die Nachricht vollständig gesendet wurde
 		}
 	}
 

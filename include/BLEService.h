@@ -43,3 +43,13 @@ class BTSecurity: public BLESecurityCallbacks {
     bool onConfirmPIN(uint32_t pin);
 };
 
+/**
+ * @brief Sendet eine Nachricht über BLE in Teilen, falls nötig.
+ * Da BLE nur Datenpakete bis zu einer maximalen Größe von 600 Bytes unterstützt,
+ * wird die Nachricht in mehrere Teile aufgeteilt, falls sie diese Größe überschreitet.
+ * Jeder Teil wird einzeln gesendet, bis die gesamte Nachricht übertragen wurde.
+ *
+ * @param message Die zu sendende Nachricht. Kann länger als 600 Bytes sein.
+ */
+void sendBLEMessage(const String& message);
+

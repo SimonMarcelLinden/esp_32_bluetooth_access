@@ -113,3 +113,18 @@ void setupBLE(const std::string &deviceName) {
     BLEDevice::startAdvertising();
     DEBUG_PRINT("Waiting for a client connection...");
 }
+
+void sendBLEMessage(const String& message) {
+	const size_t chunkSize = 600;
+	size_t messageLength = message.length();
+	size_t offset = 0;
+
+	while (offset < messageLength) {
+		size_t len = (messageLength - offset) > chunkSize ? chunkSize : (messageLength - offset);
+		String chunk = message.substring(offset, offset + len);
+		pCharacteristic->setValue(chunk.c_str());
+		pCharacteristic->notify();
+		offset += len;
+		delay(50); // Kleine Verzögerung, um Puffer zu leeren
+	}
+}
